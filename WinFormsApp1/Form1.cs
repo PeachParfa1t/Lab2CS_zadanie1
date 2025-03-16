@@ -1,3 +1,8 @@
+using System;
+using System.IO;
+using System.Windows.Forms;
+using Microsoft.VisualBasic.Logging;
+
 namespace WinFormsApp1
 {
     public partial class Form1 : Form
@@ -34,22 +39,7 @@ namespace WinFormsApp1
             string firstSentence = textBox1.Text;
             string secondSentence = textBox2.Text;
 
-            string[] firstWords = firstSentence.Split(' ');
-            string[] secondWords = secondSentence.Split(' ');
-            string[] uniqueFirstWords = firstWords.Distinct().ToArray();
-
-            string result = "Результат:\n";
-            foreach (string word in uniqueFirstWords)
-            {
-                if (secondWords.Contains(word))
-                {
-                    result += $"Слово '{word}' есть во втором предложении.\n";
-                }
-                else
-                {
-                    result += $"Слова '{word}' нет во втором предложении.\n";
-                }
-            }
+            string result = Logic.CompareSentences(firstSentence, secondSentence);
 
             MessageBox.Show(result, "Проверка предложений", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -66,5 +56,30 @@ namespace WinFormsApp1
         private void textBox1_TextChanged(object sender, EventArgs e) { }
 
         private void textBox2_TextChanged(object sender, EventArgs e) { }
+    }
+
+    public static class Logic
+    {
+        public static string CompareSentences(string firstSentence, string secondSentence)
+        {
+            string[] firstWords = firstSentence.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
+            string[] secondWords = secondSentence.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
+            string[] uniqueFirstWords = firstWords.Distinct().ToArray();
+
+            string result = "Результат:\n";
+            foreach (string word in uniqueFirstWords)
+            {
+                if (secondWords.Contains(word))
+                {
+                    result += $"Слово '{word}' есть во втором предложении.\n";
+                }
+                else
+                {
+                    result += $"Слова '{word}' нет во втором предложении.\n";
+                }
+            }
+
+            return result;
+        }
     }
 }
