@@ -49,10 +49,6 @@ namespace WinFormsApp1
             SaveUserData();
         }
 
-        private void label1_Click(object sender, EventArgs e) { }
-
-        private void label3_Click(object sender, EventArgs e) { }
-
         private void textBox1_TextChanged(object sender, EventArgs e) { }
 
         private void textBox2_TextChanged(object sender, EventArgs e) { }
@@ -62,24 +58,95 @@ namespace WinFormsApp1
     {
         public static string CompareSentences(string firstSentence, string secondSentence)
         {
-            string[] firstWords = firstSentence.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
-            string[] secondWords = secondSentence.Split(' ', System.StringSplitOptions.RemoveEmptyEntries);
-            string[] uniqueFirstWords = firstWords.Distinct().ToArray();
+            string[] firstWords = ManualSplit(firstSentence); // Разбиваем первое предложение на слова
+            string[] secondWords = ManualSplit(secondSentence); // Разбиваем второе предложение на слова
+            string[] uniqueFirstWords = GetUniqueWords(firstWords); // Убираем дубликаты из первого предложения
 
-            string result = "Результат:\n";
-            foreach (string word in uniqueFirstWords)
+            string result = "Результат:\n"; // Строка для хранения результата
+            foreach (string word in uniqueFirstWords) // Перебираем уникальные слова из первого предложения
             {
-                if (secondWords.Contains(word))
+                if (ContainsWord(secondWords, word)) // Проверяем, есть ли слово во втором предложении
                 {
-                    result += $"Слово '{word}' есть во втором предложении.\n";
+                    result += $"Слово '{word}' есть во втором предложении.\n"; // Добавляем в результат
                 }
                 else
                 {
-                    result += $"Слова '{word}' нет во втором предложении.\n";
+                    result += $"Слова '{word}' нет во втором предложении.\n"; // Добавляем в результат
                 }
             }
 
-            return result;
+            return result; // Возвращаем итоговую строку
+        }
+
+        // Метод для разбиения строки на слова без использования встроенного Split
+        private static string[] ManualSplit(string sentence)
+        {
+            string[] words = new string[sentence.Length]; // Создаем массив максимальной возможной длины
+            int wordCount = 0; // Счетчик количества слов
+            string currentWord = ""; // Переменная для хранения текущего слова
+
+            for (int i = 0; i < sentence.Length; i++) // Перебираем символы строки
+            {
+                if (sentence[i] != ' ') // Если символ не пробел, добавляем его в текущее слово
+                {
+                    currentWord += sentence[i];
+                }
+                else if (currentWord != "") // Если встретился пробел и текущее слово не пустое
+                {
+                    words[wordCount++] = currentWord; // Добавляем слово в массив
+                    currentWord = ""; // Очищаем переменную для следующего слова
+                }
+            }
+
+            if (currentWord != "") // Добавляем последнее слово, если оно есть
+            {
+                words[wordCount++] = currentWord;
+            }
+
+            Array.Resize(ref words, wordCount); // Обрезаем массив до фактического количества слов
+            return words; // Возвращаем массив слов
+        }
+
+        // Метод для удаления дубликатов из массива слов
+        private static string[] GetUniqueWords(string[] words)
+        {
+            string[] uniqueWords = new string[words.Length]; // Создаем массив для уникальных слов
+            int uniqueCount = 0; // Счетчик уникальных слов
+
+            foreach (string word in words) // Перебираем все слова
+            {
+                bool exists = false; // Флаг для проверки наличия слова в массиве уникальных
+                for (int i = 0; i < uniqueCount; i++) // Проверяем, есть ли слово уже в уникальном массиве
+                {
+                    if (uniqueWords[i] == word)
+                    {
+                        exists = true; // Если нашли совпадение, выходим из цикла
+                        break;
+                    }
+                }
+                if (!exists) // Если слово уникально
+                {
+                    uniqueWords[uniqueCount++] = word; // Добавляем его в массив уникальных слов
+                }
+            }
+
+            Array.Resize(ref uniqueWords, uniqueCount); // Обрезаем массив до фактического количества уникальных слов
+            return uniqueWords; // Возвращаем массив уникальных слов
+        }
+
+        // Метод для проверки наличия слова в массиве слов
+        private static bool ContainsWord(string[] words, string word)
+        {
+            foreach (string w in words) // Перебираем все слова в массиве
+            {
+                if (w == word) // Если нашли совпадение, возвращаем true
+                {
+                    return true;
+                }
+            }
+            return false; // Если слово не найдено, возвращаем false
         }
     }
+
+
 }
